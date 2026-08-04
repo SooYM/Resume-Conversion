@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-04T00:00:00+08:00",
+  "title": "Design System: QIU Resume Converter",
+  "extensions": {
+    "colorMeta": {
+      "ink": { "role": "primary", "displayName": "Institutional Ink", "canonical": "#17201d" },
+      "accent": { "role": "primary", "displayName": "Action Lime", "canonical": "#b9ff3d" },
+      "paper": { "role": "neutral", "displayName": "Paper White", "canonical": "#ffffff" },
+      "workspace": { "role": "neutral", "displayName": "Cool Workspace", "canonical": "#eef0ee" },
+      "warning": { "role": "attention", "displayName": "Attention Ochre", "canonical": "#a4531c" }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Editorial Display", "purpose": "Upload-screen promise only." },
+      "body": { "displayName": "Operational Body", "purpose": "Editor controls and guidance." },
+      "document": { "displayName": "A4 Document", "purpose": "Template résumé content only." }
+    },
+    "shadows": [
+      { "name": "paper-lift", "value": "0 12px 40px rgba(24,35,31,.16)", "purpose": "A4 preview only." }
+    ],
+    "motion": [
+      { "name": "state-ease", "value": "0.2s ease-out", "purpose": "Upload target hover and drag feedback." }
+    ],
+    "breakpoints": [
+      { "name": "compact-workspace", "value": "1050px" },
+      { "name": "single-column", "value": "760px" },
+      { "name": "single-field", "value": "460px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Export Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Decisive document export action.",
+      "html": "<button class=\"ds-btn-primary\">Save as PDF</button>",
+      "css": ".ds-btn-primary{border:0;border-radius:0;background:#b9ff3d;color:#213114;padding:.72rem 1rem;font-weight:800;transition:background .2s ease-out}.ds-btn-primary:hover{background:#d0ff78}.ds-btn-primary:focus-visible{outline:3px solid #84a71e;outline-offset:2px}"
+    },
+    {
+      "name": "Editable Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Square, high-clarity editor input.",
+      "html": "<label class=\"ds-field\"><span>Name</span><input value=\"Noor Asneeda\"></label>",
+      "css": ".ds-field{display:flex;flex-direction:column;gap:.35rem;color:#52605a;font:800 .72rem -apple-system,BlinkMacSystemFont,Segoe UI,sans-serif}.ds-field input{border:1px solid #abb4af;border-radius:0;background:#fff;color:#17201d;padding:.7rem .75rem}.ds-field input:focus-visible{outline:3px solid #84a71e;outline-offset:2px}"
+    },
+    {
+      "name": "Missing Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Incomplete data state with both color and text cues.",
+      "html": "<label class=\"ds-field ds-missing\"><span>Research <em>Missing</em></span><input placeholder=\"Enter research results\"></label>",
+      "css": ".ds-field{display:flex;flex-direction:column;gap:.35rem;color:#52605a;font:800 .72rem -apple-system,BlinkMacSystemFont,Segoe UI,sans-serif}.ds-field span{display:flex;justify-content:space-between}.ds-field em{color:#a4531c;font-style:normal}.ds-field input{border:1px solid #c58961;border-radius:0;background:#fffaf6;padding:.7rem .75rem}.ds-field input:focus-visible{outline:3px solid #84a71e;outline-offset:2px}"
+    },
+    {
+      "name": "Command Bar",
+      "kind": "nav",
+      "description": "Dark fixed-height strip for identity, state, and export.",
+      "html": "<nav class=\"ds-bar\"><b>Q Resume Converter</b><button>Save as PDF</button></nav>",
+      "css": ".ds-bar{height:68px;display:flex;align-items:center;justify-content:space-between;background:#17201d;color:#f5f7f5;padding:0 1.5rem;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif}.ds-bar button{border:0;border-radius:0;background:#b9ff3d;color:#213114;padding:.72rem 1rem;font-weight:800}.ds-bar button:hover{background:#d0ff78}.ds-bar button:focus-visible{outline:3px solid #84a71e;outline-offset:2px}"
+    },
+    {
+      "name": "A4 Paper",
+      "kind": "custom",
+      "description": "Fixed-geometry résumé preview and print artifact.",
+      "html": "<article class=\"ds-paper\"><h1>烹饪与餐饮管理专业外方骨干教师简介</h1><p>Resume of QIU Instructor</p></article>",
+      "css": ".ds-paper{width:794px;min-height:1123px;background:#fff;color:#000;padding:78px 118px 70px;box-shadow:0 12px 40px rgba(24,35,31,.16);font:16px/1.18 Times New Roman,Times,serif}.ds-paper h1{text-align:center;font:800 22px/1.15 Microsoft YaHei,PingFang SC,sans-serif}.ds-paper p{text-align:center;font:700 22px/1.2 Gungsuh,Courier New,monospace}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Registrar's Worktable",
+    "overview": "An orderly document-preparation surface that keeps contemporary app controls outside a faithful institutional A4 template.",
+    "keyCharacteristics": ["Split editor and paper", "Square ruled controls", "Rare operational lime", "Print-faithful résumé"],
+    "rules": [
+      { "name": "Paper Boundary", "body": "App colors stop at the paper edge.", "section": "colors" },
+      { "name": "Single Lift", "body": "Only the A4 paper receives ambient shadow.", "section": "elevation" }
+    ],
+    "dos": ["Keep missing data visible and editable.", "Preserve A4 print geometry."],
+    "donts": ["Do not restyle the résumé with app chrome.", "Do not truncate user data to force one page."]
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "name": "resume-conversion",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "node --test src/parser.test.js"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "latest",
+    "mammoth": "latest",
+    "pdfjs-dist": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "tesseract.js": "latest",
+    "vite": "latest"
+  },
+  "devDependencies": {}
+}
