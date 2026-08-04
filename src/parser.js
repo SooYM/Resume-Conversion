@@ -1,4 +1,5 @@
 export const emptyResume = () => ({
+  documentTitle: 'Resume of QIU Instructor',
   name: '',
   gender: '',
   nationality: '',

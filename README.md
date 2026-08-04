@@ -1,6 +1,6 @@
 # Resume Conversion Resume Converter
 
-Browser-based résumé converter that maps uploaded content into the supplied Resume Conversion instructor résumé template, highlights missing attributes, and exports the edited result through the browser's PDF print flow.
+Browser-based résumé converter that maps uploaded content into the supplied Resume Conversion instructor résumé template, highlights missing attributes, allows title editing, and exports the edited result as DOCX or PDF.
 
 ## Run locally
 
@@ -26,7 +26,7 @@ The converter also imports a likely portrait from PDF/DOCX files or a scanned fi
 
 ## Export
 
-Choose **Save as PDF**, then select **Save as PDF** in the browser print dialog. Print CSS fixes the document to A4 and removes editor-only blank indicators.
+Edit **Resume title** in the Document section. Choose **Download DOCX** for a Word file, or choose **Save as PDF** and select **Save as PDF** in the browser print dialog. Both outputs preserve the A4 template structure.
 
 ## Checks
 

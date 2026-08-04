@@ -52,6 +52,11 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .status-dot.warning { background: #ffb27a; box-shadow: none; }
 .export-button { justify-self: end; border: 0; background: var(--accent); color: var(--accent-dark); padding: .72rem 1rem; display: flex; gap: .55rem; align-items: center; font-weight: 800; cursor: pointer; }
 .export-button:hover { background: #d0ff78; }
+.export-actions { justify-self: end; display: flex; gap: .55rem; }
+.export-button.secondary { border: 1px solid var(--muted); background: transparent; color: var(--paper); }
+.export-button.secondary:hover { border-color: var(--accent); color: var(--accent); background: var(--ink); }
+.export-button:disabled { cursor: progress; opacity: .65; }
+.button-short { display: none; }
 .workspace-body { display: grid; grid-template-columns: minmax(390px, 38vw) 1fr; min-height: calc(100vh - 68px); }
 .editor-panel { height: calc(100vh - 68px); overflow-y: auto; background: #f8f9f8; border-right: 1px solid #cbd1cd; padding: 1.5rem; }
 .source-file { min-width: 0; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: .8rem; align-items: center; padding: .8rem; border: 1px solid var(--line); background: white; }
@@ -89,7 +94,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .resume-page { width: 794px; min-height: 1123px; padding: 78px 118px 70px; flex: none; background: var(--paper); color: #000; box-shadow: 0 12px 40px rgba(24,35,31,.16); font: 16px/1.18 'Times New Roman', Times, serif; }
 .resume-title { text-align: center; margin-bottom: 42px; }
 .resume-title h1 { margin: 0 0 9px; font: 800 22px/1.15 'Microsoft YaHei', 'PingFang SC', sans-serif; white-space: nowrap; }
-.resume-title h2 { margin: 0; font: 700 22px/1.2 Gungsuh, 'Courier New', monospace; letter-spacing: -.03em; white-space: nowrap; }
+.resume-title h2 { margin: 0; font: 700 22px/1.2 Gungsuh, 'Courier New', monospace; letter-spacing: -.03em; overflow-wrap: anywhere; }
 .name-blank { color: #999; font-style: italic; }
 .personal-preview { min-height: 221px; position: relative; }
 .personal-lines { padding: 17px 105px 0 0; }
@@ -136,6 +141,10 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 
 @media (max-width: 460px) {
   .wordmark strong { display: none; }
+  .export-actions { gap: .35rem; }
+  .export-button { padding: .65rem .7rem; }
+  .button-long { display: none; }
+  .button-short { display: inline; }
   .field-grid { grid-template-columns: 1fr; }
   .editor-panel { padding: 1rem; }
 }

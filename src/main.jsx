@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { countMissing, emptyResume, parseResumeText } from './parser'
 import { extractResume } from './fileReader'
+import { createResumeDocx, downloadBlob, safeFileName } from './docxExport'
 import './styles.css'
 
 const personalFields = [
@@ -18,7 +19,8 @@ const Icon = ({ name }) => {
     plus: <path d="M12 5v14M5 12h14"/>,
     trash: <><path d="M5 7h14M9 7V4h6v3m2 0-1 14H8L7 7"/></>,
     check: <path d="m5 12 4 4L19 6"/>,
-    edit: <><path d="m4 20 4.5-1 10-10-3.5-3.5-10 10z"/><path d="m13.5 6.5 3.5 3.5"/></>
+    edit: <><path d="m4 20 4.5-1 10-10-3.5-3.5-10 10z"/><path d="m13.5 6.5 3.5 3.5"/></>,
+    download: <><path d="M12 3v12m0 0 5-5m-5 5-5-5"/><path d="M5 21h14"/></>
   }
   return <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">{paths[name]}</svg>
 }
@@ -85,6 +87,7 @@ function Editor({ resume, setResume, fileName, onReset }) {
   return <aside className="editor-panel">
     <div className="source-file"><Icon name="file"/><span><small>Source file</small><strong>{fileName}</strong></span><button type="button" onClick={onReset}>Replace</button></div>
     <div className="editor-heading"><div><p>Review & complete</p><h2>Your information</h2></div><span>{countMissing(resume)} missing</span></div>
+    <section className="form-section document-section"><h3>Document</h3><Field label="Resume title" value={resume.documentTitle} onChange={(value) => setField('documentTitle', value)}/></section>
     <section className="form-section">
       <h3>Personal details</h3>
       <div className="field-grid">
@@ -125,7 +128,7 @@ function ResumePage({ resume }) {
     */}
     <header className="resume-title">
       <h1>烹饪与餐饮管理专业外方骨干教师简介</h1>
-      <h2>Resume of Resume Conversion Instructor—（{resume.name || <span className="name-blank">Name</span>})</h2>
+      <h2>{resume.documentTitle || 'Resume'}—（{resume.name || <span className="name-blank">Name</span>})</h2>
     </header>
     <section className="personal-preview">
       <div className="personal-lines">
@@ -148,10 +151,24 @@ function ResumePage({ resume }) {
 
 function Workspace({ initialResume, fileName, onReset }) {
   const [resume, setResume] = useState(initialResume)
+  const [docxBusy, setDocxBusy] = useState(false)
   const missing = useMemo(() => countMissing(resume), [resume])
   useEffect(() => setResume(initialResume), [initialResume])
+  const fileBase = safeFileName(resume.documentTitle || resume.name || 'resume')
+  const savePdf = () => {
+    const previousTitle = document.title
+    document.title = fileBase
+    window.print()
+    document.title = previousTitle
+  }
+  const saveDocx = async () => {
+    setDocxBusy(true)
+    try { downloadBlob(await createResumeDocx(resume), `${fileBase}.docx`) }
+    catch (error) { console.error(error); window.alert('DOCX export failed. Please try again.') }
+    finally { setDocxBusy(false) }
+  }
   return <div className="workspace">
-    <header className="app-bar"><div className="wordmark"><span>Q</span><strong>Resume Converter</strong></div><div className="status"><span className={missing ? 'status-dot warning' : 'status-dot'}></span>{missing ? `${missing} fields need attention` : 'Ready to export'}</div><button className="export-button" type="button" onClick={() => window.print()}><Icon name="print"/>Save as PDF</button></header>
+    <header className="app-bar"><div className="wordmark"><span>Q</span><strong>Resume Converter</strong></div><div className="status"><span className={missing ? 'status-dot warning' : 'status-dot'}></span>{missing ? `${missing} fields need attention` : 'Ready to export'}</div><div className="export-actions"><button className="export-button secondary" type="button" disabled={docxBusy} onClick={saveDocx}><Icon name="download"/><span className="button-long">{docxBusy ? 'Preparing DOCX…' : 'Download DOCX'}</span><span className="button-short">DOCX</span></button><button className="export-button" type="button" onClick={savePdf}><Icon name="print"/><span className="button-long">Save as PDF</span><span className="button-short">PDF</span></button></div></header>
     <main className="workspace-body"><Editor resume={resume} setResume={setResume} fileName={fileName} onReset={onReset}/><section className="preview-stage"><div className="preview-label"><span>Live preview</span><small>A4 · Template matched</small></div><ResumePage resume={resume}/></section></main>
   </div>
 }
