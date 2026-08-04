@@ -18,6 +18,11 @@ export const emptyResume = () => ({
 
 const clean = (value = '') => value.replace(/\u00a0/g, ' ').replace(/[ \t]+/g, ' ').trim()
 
+const normalizeHeading = (value) => clean(value)
+  .replace(/\bresu(?:it|lt)5\b/gi, 'results')
+  .replace(/\bresuits\b/gi, 'results')
+  .replace(/\bpubiications?\b/gi, 'publications')
+
 const fieldPatterns = {
   name: /^(?:full\s*)?name\s*[:\-]\s*(.+)$/i,
   gender: /^(?:gender|sex)\s*[:\-]\s*(.+)$/i,
@@ -31,13 +36,14 @@ const fieldPatterns = {
 }
 
 const sectionMatcher = /^(education(?:al background)?|academic background|current employment|work(?:ing)? experience|employment(?: history)?|professional experience|(?:main\s+)?research(?: results| output| publications| experience| projects?| interests?)?|research\s*(?:&|and)\s*publications|(?:selected|academic)?\s*publications?|journal articles?|conference papers?)\s*:?$/i
-const otherSectionMatcher = /^(?:awards?|honou?rs?|skills?|certifications?|languages?|references?|projects?|professional development|training|volunteer(?:ing)?|activities|interests?)\s*:?$/i
+const otherSectionMatcher = /^(?:awards?|honou?rs?|skills?|certifications?|languages?|references?|projects?|professional (?:development|memberships?|affiliations?)|training|volunteer(?:ing)?|activities|interests?)\s*:?$/i
 
 function splitSections(lines) {
   const sections = { general: [] }
   let current = 'general'
   for (const line of lines) {
-    const heading = line.match(sectionMatcher)?.[1]?.toLowerCase()
+    const normalizedLine = normalizeHeading(line)
+    const heading = normalizedLine.match(sectionMatcher)?.[1]?.toLowerCase()
     if (heading) {
       current = heading.includes('educ') || heading.includes('academic')
         ? 'education'
@@ -45,7 +51,7 @@ function splitSections(lines) {
           ? 'experience'
           : 'research'
       sections[current] ??= []
-    } else if (otherSectionMatcher.test(line)) {
+    } else if (otherSectionMatcher.test(normalizedLine)) {
       current = 'other'
       sections.other ??= []
     } else {

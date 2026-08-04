@@ -78,7 +78,7 @@ async function pdfPortraitCandidates(pdf, pdfjs) {
 
 async function renderPdfPage(page) {
   const baseViewport = page.getViewport({ scale: 1 })
-  const viewport = page.getViewport({ scale: Math.min(1.25, 1000 / baseViewport.width) })
+  const viewport = page.getViewport({ scale: Math.min(1.75, 1200 / baseViewport.width) })
   const canvas = document.createElement('canvas')
   canvas.width = Math.round(viewport.width)
   canvas.height = Math.round(viewport.height)
@@ -241,7 +241,7 @@ async function ocrSources(sources, onProgress) {
     logger: ({ status, progress }) => onProgress?.(`${status} · page ${pageNumber}/${sources.length} · ${Math.round((progress || 0) * 100)}%`)
   })
   try {
-    await worker.setParameters({ tessedit_pageseg_mode: '6' })
+    await worker.setParameters({ tessedit_pageseg_mode: '3', preserve_interword_spaces: '1' })
     return await recognizeOcrPages(sources, (source, index) => {
       pageNumber = index + 1
       return worker.recognize(source)

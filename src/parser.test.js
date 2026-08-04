@@ -129,6 +129,19 @@ Available upon request`)
   assert.doesNotMatch(resume.researchResults, /Best Lecturer|Available upon request/)
 })
 
+test('collects research under OCR-damaged headings', () => {
+  const resume = parseResumeText(`Name: Aisha Rahman
+Main research result5
+2025 Sustainable gastronomy education in Malaysian universities.
+2024 Community food-waste reduction project.
+Professional Memberships
+Malaysian Culinary Association`)
+
+  assert.match(resume.researchResults, /Sustainable gastronomy education/)
+  assert.match(resume.researchResults, /food-waste reduction/)
+  assert.doesNotMatch(resume.researchResults, /Malaysian Culinary Association/)
+})
+
 test('selects a portrait image and rejects logos or full-page scans', () => {
   assert.equal(selectPortraitCandidate([
     { dataUrl: 'logo', width: 600, height: 120, fullPage: false },
