@@ -206,34 +206,49 @@ async function detectFacePortrait(source) {
   return portrait.toDataURL('image/jpeg', 0.9)
 }
 
-async function ocrSources(sources, onProgress) {
-  const { default: Tesseract } = await import('tesseract.js')
-  let pageNumber = 1
+export async function recognizeOcrPages(sources, recognize, onProgress, timeoutMs = 60000) {
   const pages = []
-  const worker = await Tesseract.createWorker('eng', 1, {
-    logger: ({ status, progress }) => onProgress?.(`${status} · page ${pageNumber}/${sources.length} · ${Math.round((progress || 0) * 100)}%`)
-  })
-  try {
-    await worker.setParameters({ tessedit_pageseg_mode: '6' })
-    for (const source of sources) {
-      onProgress?.(`Scanning page ${pageNumber} of ${sources.length}…`)
-      let timeout
+  for (let index = 0; index < sources.length; index += 1) {
+    const pageNumber = index + 1
+    onProgress?.(`Scanning page ${pageNumber} of ${sources.length}…`)
+    let timeout
+    try {
       const result = await Promise.race([
-        worker.recognize(source),
-        new Promise((resolve) => { timeout = setTimeout(() => resolve(null), 30000) })
+        recognize(sources[index], index),
+        new Promise((resolve) => { timeout = setTimeout(() => resolve(null), timeoutMs) })
       ])
-      clearTimeout(timeout)
       if (!result) {
         onProgress?.(`Page ${pageNumber} took too long; continuing with extracted pages…`)
         break
       }
       pages.push(result.data.text)
-      pageNumber += 1
+    } catch {
+      onProgress?.(`Page ${pageNumber} could not be read; continuing…`)
+    } finally {
+      clearTimeout(timeout)
     }
+  }
+  return pages.join('\n')
+}
+
+async function ocrSources(sources, onProgress) {
+  const { default: Tesseract } = await import('tesseract.js')
+  let pageNumber = 1
+  const worker = await Tesseract.createWorker('eng', 1, {
+    workerPath: `${import.meta.env.BASE_URL}ocr/worker.min.js`,
+    corePath: `${import.meta.env.BASE_URL}ocr/tesseract-core-lstm.wasm.js`,
+    langPath: `${import.meta.env.BASE_URL}ocr`,
+    logger: ({ status, progress }) => onProgress?.(`${status} · page ${pageNumber}/${sources.length} · ${Math.round((progress || 0) * 100)}%`)
+  })
+  try {
+    await worker.setParameters({ tessedit_pageseg_mode: '6' })
+    return await recognizeOcrPages(sources, (source, index) => {
+      pageNumber = index + 1
+      return worker.recognize(source)
+    }, onProgress)
   } finally {
     void worker.terminate()
   }
-  return pages.join('\n')
 }
 
 async function readPdf(file, onProgress) {
@@ -265,7 +280,12 @@ async function readPdf(file, onProgress) {
   }
   const text = scanned ? await ocrSources(renderedPages, onProgress) : embeddedText
   const embeddedPhoto = scanned ? '' : selectPortraitCandidate(await pdfPortraitCandidates(pdf, pdfjs))
-  const photo = embeddedPhoto || await detectFacePortrait(renderedPages[0] || await renderPdfPage(await pdf.getPage(1)))
+  let photo = embeddedPhoto
+  if (!photo) try {
+    photo = await detectFacePortrait(renderedPages[0] || await renderPdfPage(await pdf.getPage(1)))
+  } catch {
+    onProgress?.('Text extracted; portrait could not be read.')
+  }
   return { text, photo }
 }
 

@@ -191,7 +191,8 @@ function App() {
       setFileName(file.name)
     } catch (error) {
       console.error(error)
-      setError('Could not extract this file. Try exporting it as PDF or DOCX again, then re-upload it.')
+      const reason = error instanceof Error && error.message ? ` (${error.message})` : ''
+      setError(`Could not extract this file${reason}. Try exporting it as PDF or DOCX again, then re-upload it.`)
     } finally {
       setBusy(false); setProgress('')
     }
