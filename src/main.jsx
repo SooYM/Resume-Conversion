@@ -25,7 +25,7 @@ const Icon = ({ name }) => {
   return <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">{paths[name]}</svg>
 }
 
-function UploadScreen({ onUpload, busy, progress }) {
+function UploadScreen({ onUpload, busy, progress, error }) {
   const inputRef = useRef(null)
   const [dragging, setDragging] = useState(false)
   const select = (files) => files?.[0] && onUpload(files[0])
@@ -58,6 +58,7 @@ function UploadScreen({ onUpload, busy, progress }) {
         <span>{busy ? progress || 'Extracting text and structure' : 'or click to browse'}</span>
       </button>
       <input ref={inputRef} className="sr-only" type="file" accept=".pdf,.docx,.txt,.rtf,.html,.htm,.md,.png,.jpg,.jpeg,.webp,.bmp,.tif,.tiff" onChange={(event) => select(event.target.files)} />
+      {error && <p className="upload-error" role="alert">{error}</p>}
       <p className="fallback-note">Unrecognized format? You’ll still get a blank, fully editable template.</p>
     </section>
   </main>
@@ -87,7 +88,7 @@ function Editor({ resume, setResume, fileName, onReset }) {
   return <aside className="editor-panel">
     <div className="source-file"><Icon name="file"/><span><small>Source file</small><strong>{fileName}</strong></span><button type="button" onClick={onReset}>Replace</button></div>
     <div className="editor-heading"><div><p>Review & complete</p><h2>Your information</h2></div><span>{countMissing(resume)} missing</span></div>
-    <section className="form-section document-section"><h3>Document</h3><Field label="Resume title" value={resume.documentTitle} onChange={(value) => setField('documentTitle', value)}/></section>
+    <section className="form-section document-section"><h3>Document</h3><div className="field-grid"><Field label="English title" value={resume.documentTitle} onChange={(value) => setField('documentTitle', value)}/><Field label="Chinese title" value={resume.chineseTitle} onChange={(value) => setField('chineseTitle', value)}/></div></section>
     <section className="form-section">
       <h3>Personal details</h3>
       <div className="field-grid">
@@ -127,7 +128,7 @@ function ResumePage({ resume }) {
       FORM: Exact supplied document reconstruction, ranked first because user pinned its format.
     */}
     <header className="resume-title">
-      <h1>烹饪与餐饮管理专业外方骨干教师简介</h1>
+      <h1>{resume.chineseTitle || <span className="name-blank">Chinese title</span>}</h1>
       <h2>{resume.documentTitle || 'Resume'}—（{resume.name || <span className="name-blank">Name</span>})</h2>
     </header>
     <section className="personal-preview">
@@ -178,9 +179,10 @@ function App() {
   const [fileName, setFileName] = useState('')
   const [busy, setBusy] = useState(false)
   const [progress, setProgress] = useState('')
+  const [error, setError] = useState('')
 
   const handleUpload = async (file) => {
-    setBusy(true); setProgress('Opening file…')
+    setBusy(true); setProgress('Opening file…'); setError('')
     try {
       const { text, photo } = await extractResume(file, setProgress)
       const parsed = text.trim() ? parseResumeText(text) : emptyResume()
@@ -189,8 +191,7 @@ function App() {
       setFileName(file.name)
     } catch (error) {
       console.error(error)
-      setResume(emptyResume())
-      setFileName(file.name)
+      setError('Could not extract this file. Try exporting it as PDF or DOCX again, then re-upload it.')
     } finally {
       setBusy(false); setProgress('')
     }
@@ -198,7 +199,7 @@ function App() {
 
   return resume
     ? <Workspace initialResume={resume} fileName={fileName} onReset={() => { setResume(null); setFileName('') }}/>
-    : <UploadScreen onUpload={handleUpload} busy={busy} progress={progress}/>
+    : <UploadScreen onUpload={handleUpload} busy={busy} progress={progress} error={error}/>
 }
 
 createRoot(document.getElementById('root')).render(<React.StrictMode><App/></React.StrictMode>)

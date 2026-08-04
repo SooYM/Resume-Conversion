@@ -1,7 +1,13 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { countMissing, parseResumeText, stripRtf } from './parser.js'
+import { countMissing, emptyResume, parseResumeText, stripRtf } from './parser.js'
 import { selectPortraitCandidate } from './fileReader.js'
+
+test('provides independently editable English and Chinese titles', () => {
+  const resume = emptyResume()
+  assert.equal(resume.documentTitle, 'Resume of QIU Instructor')
+  assert.equal(resume.chineseTitle, '烹饪与餐饮管理专业外方骨干教师简介')
+})
 
 test('extracts labelled fields and common sections', () => {
   const resume = parseResumeText(`Name: Noor Asneeda binti Ishak

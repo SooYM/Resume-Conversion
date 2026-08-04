@@ -36,7 +36,7 @@ function educationTable(rows) {
 export function buildDocumentXml(resume, hasPhoto = false, imageTitle = false) {
   const experiences = resume.experience.map((row) => `<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr><w:spacing w:after="40"/></w:pPr>${run(row.period || '')}<w:r><w:br/></w:r>${run(`${row.organization || ''}${row.role ? ` (${row.role})` : ''}`)}</w:p>`).join('')
   const research = String(resume.researchResults || '').split(/\r?\n/).map((line) => paragraph(line, { after: 0 })).join('')
-  const chineseTitle = imageTitle ? chineseTitleDrawing() : paragraph('烹饪与餐饮管理专业外方骨干教师简介', { bold: true, size: 30, align: 'center', after: 0, font: 'PingFang SC', eastAsia: 'PingFang SC' })
+  const chineseTitle = imageTitle ? chineseTitleDrawing() : paragraph(resume.chineseTitle || '烹饪与餐饮管理专业外方骨干教师简介', { bold: true, size: 30, align: 'center', after: 0, font: 'PingFang SC', eastAsia: 'PingFang SC' })
   return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><w:body>${chineseTitle}${paragraph(`${resume.documentTitle || 'Resume'}— (${resume.name || 'Name'})`, { bold: true, size: 30, align: 'center' })}${personalTable(resume, hasPhoto)}${paragraph('Educational background:', { after: 0 })}${educationTable(resume.education)}${paragraph('Working experience:', { after: 0 })}${experiences}${paragraph('Main research results:', { after: 0 })}${research}<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1168" w:right="1770" w:bottom="1049" w:left="1770" w:header="0" w:footer="0" w:gutter="0"/></w:sectPr></w:body></w:document>`
 }
 
@@ -52,7 +52,7 @@ async function jpegPhoto(dataUrl) {
   return canvas.toDataURL('image/jpeg', 0.9).split(',')[1]
 }
 
-function chineseTitlePng() {
+function chineseTitlePng(title) {
   const canvas = document.createElement('canvas')
   canvas.width = 1200
   canvas.height = 90
@@ -61,13 +61,13 @@ function chineseTitlePng() {
   context.font = '700 42px "PingFang SC", "Microsoft YaHei", sans-serif'
   context.textAlign = 'center'
   context.textBaseline = 'middle'
-  context.fillText('烹饪与餐饮管理专业外方骨干教师简介', 600, 45)
+  context.fillText(title || '烹饪与餐饮管理专业外方骨干教师简介', 600, 45)
   return canvas.toDataURL('image/png').split(',')[1]
 }
 
 export async function createResumeDocx(resume) {
   const portrait = await jpegPhoto(resume.photo)
-  const titleImage = chineseTitlePng()
+  const titleImage = chineseTitlePng(resume.chineseTitle)
   const zip = new JSZip()
   zip.file('[Content_Types].xml', '<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="jpg" ContentType="image/jpeg"/><Default Extension="png" ContentType="image/png"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/><Override PartName="/word/numbering.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml"/><Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/></Types>')
   zip.file('_rels/.rels', '<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/></Relationships>')

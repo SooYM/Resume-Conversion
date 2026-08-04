@@ -210,13 +210,13 @@ async function ocrSources(sources, onProgress) {
   const { default: Tesseract } = await import('tesseract.js')
   let pageNumber = 1
   const pages = []
-  for (const source of sources) {
-    onProgress?.(`Scanning page ${pageNumber} of ${sources.length}…`)
-    const worker = await Tesseract.createWorker('eng', 1, {
-      logger: ({ status, progress }) => onProgress?.(`${status} · page ${pageNumber}/${sources.length} · ${Math.round((progress || 0) * 100)}%`)
-    })
-    try {
-      await worker.setParameters({ tessedit_pageseg_mode: '6' })
+  const worker = await Tesseract.createWorker('eng', 1, {
+    logger: ({ status, progress }) => onProgress?.(`${status} · page ${pageNumber}/${sources.length} · ${Math.round((progress || 0) * 100)}%`)
+  })
+  try {
+    await worker.setParameters({ tessedit_pageseg_mode: '6' })
+    for (const source of sources) {
+      onProgress?.(`Scanning page ${pageNumber} of ${sources.length}…`)
       let timeout
       const result = await Promise.race([
         worker.recognize(source),
@@ -228,10 +228,10 @@ async function ocrSources(sources, onProgress) {
         break
       }
       pages.push(result.data.text)
-    } finally {
-      void worker.terminate()
+      pageNumber += 1
     }
-    pageNumber += 1
+  } finally {
+    void worker.terminate()
   }
   return pages.join('\n')
 }

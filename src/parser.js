@@ -1,4 +1,5 @@
 export const emptyResume = () => ({
+  chineseTitle: '烹饪与餐饮管理专业外方骨干教师简介',
   documentTitle: 'Resume of QIU Instructor',
   name: '',
   gender: '',

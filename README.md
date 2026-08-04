@@ -26,7 +26,7 @@ The converter also imports a likely portrait from PDF/DOCX files or a scanned fi
 
 ## Export
 
-Edit **Resume title** in the Document section. Choose **Download DOCX** for a Word file, or choose **Save as PDF** and select **Save as PDF** in the browser print dialog. Both outputs preserve the A4 template structure.
+Edit the **English title** and **Chinese title** in the Document section. Choose **Download DOCX** for a Word file, or choose **Save as PDF** and select **Save as PDF** in the browser print dialog. Both outputs preserve the A4 template structure.
 
 ## Checks
 
